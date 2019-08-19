@@ -38,7 +38,10 @@ class AdvertManager {
      * @param bool $duplicate
      * @return HtmlString|string
      */
-    public function getHTML($type, $duplicate = false){
+    public function getHTML($type, $place, $duplicate = false){
+        if(!empty($place) && $place!=$type){
+            $advert_category = AdvertCategory::where('type', $type.'_'.$place)->first();            
+        }
         $advert_category = AdvertCategory::where('type', $type)->first();
         if(!$advert_category){
             return '';
@@ -52,8 +55,15 @@ class AdvertManager {
                     $query->whereNotIn('id', $this->used);
                 }
             })
+            ->where(function($q){
+                $q->where('featured_from','>=',\Carbon\Carbon::now()->toDateTimeString();
+            })
+            ->where(function($q){
+                $q->where('featured_to','<=',\Carbon\Carbon::now()->toDateTimeString();
+            })
             ->active()
             ->orderBy('viewed_at', 'ASC')
+
             ->first();
 
         if($advert){
